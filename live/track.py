@@ -159,6 +159,16 @@ class Track(LoggingObject):
 			clip.name = clip_name
 			self.trace("scan_clip_names: (%d, %d) -> %s" % (self.index, clip.index, clip.name))
 
+	def scan_clip_paths(self):
+		#--------------------------------------------------------------------------
+		# scan for clip names.
+		# is nice, but slows things down significantly -- so disable by default.
+		#--------------------------------------------------------------------------
+		for clip in self.active_clips:
+			clip_path = self.set.get_clip_path(self.index, clip.index)
+			clip.path = clip_path
+			self.trace("scan_clip_paths: (%d, %d) -> %s" % (self.index, clip.index, clip.path))
+
 	#------------------------------------------------------------------------
 	# get/set: volume
 	#------------------------------------------------------------------------

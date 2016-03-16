@@ -406,6 +406,19 @@ class Set (live.LoggingObject):
 		""" Set a given clip's name. """
 		self.live.cmd("/live/name/clip", track, index, name)
 
+	#------------------------------------------------------------------------
+	# /live/path/clip
+	#------------------------------------------------------------------------
+
+	def get_clip_paths(self, track, offset, count):
+		""" Return a list of a given set of clip paths. """
+		self.trace("TEST")
+		return self.live.query("/live/path/clipblock", track, offset, 1, count)
+
+	def get_clip_path(self, track, index):
+		""" Return a specific clip file path. """
+		self.trace("TEST")
+		return self.live.query("/live/path/clip", track, index)
 
 	#------------------------------------------------------------------------
 	# /live/arm
@@ -586,7 +599,7 @@ class Set (live.LoggingObject):
 	# SCAN
 	#------------------------------------------------------------------------
 
-	def scan(self, group_re = None, scan_scenes = False, scan_devices = False, scan_clip_names = False):
+	def scan(self, group_re = None, scan_scenes = False, scan_devices = False, scan_clip_names = False, scan_clip_paths = False):
 		""" Interrogates the currently open Ableton Live set for its structure:
 		number of tracks, clips, scenes, etc.
 
@@ -595,6 +608,7 @@ class Set (live.LoggingObject):
 		scan_scenes -- queries scenes
 		scan_devices -- queries tracks for devices and their corresponding parameters
 		scan_clip_names -- queries clips for their human-readable names
+		scan_clip_paths -- queries clips for their file paths
 		"""
 
 		#------------------------------------------------------------------------
@@ -666,6 +680,10 @@ class Set (live.LoggingObject):
 
 				if scan_clip_names:
 					clip_names = self.get_clip_names
+
+				if scan_clip_paths:
+					clip_paths = self.get_clip_paths
+
 				for n in range(0, len(clip_info), 3):
 					clip_index = n / 3
 					state = clip_info[n + 1]
@@ -703,6 +721,11 @@ class Set (live.LoggingObject):
 							clip_name = self.get_clip_name(track.index, clip_index)
 							track.clips[clip_index].name = clip_name
 							self.trace("scan_layout:  - clip %d: %s" % (clip_index, clip_name))
+
+						if scan_clip_paths:
+							clip_path = self.get_clip_path(track.index, clip_index)
+							track.clips[clip_index].name = clip_path
+							self.trace("scan_layout_path:  - clip %d: %s" % (clip_index, clip_path))
 
 				#--------------------------------------------------------------------------
 				# query each track for its device list, and any parameters belonging to
